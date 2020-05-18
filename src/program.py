@@ -10,11 +10,13 @@ def main():
 	table = gettable(rows, cols, choice)
 	filltable(counter,table,cols)
 	if choice == "JK":
+		header = "Inputs(J0,K0,J1,K1...)"
 		makeJK(table,rows,cols)
 	elif choice== "D":
+		header = "Inputs(D0,D1...)"
 		for row in table:
 			row[2] = row[1]
-	print(tabulate(table, headers=["Current State", "Next State", "Inputs(J0,K0,J1,K1...)"],tablefmt="fancy_grid",numalign="center",stralign="center"))
+	print(tabulate(table, headers=["Current State", "Next State", header],tablefmt="fancy_grid",numalign="center",stralign="center"))
 	#printTable(table)
 	input("Press Enter")
 	
