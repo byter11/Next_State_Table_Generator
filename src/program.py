@@ -1,13 +1,20 @@
 import math
 from tabulate import tabulate
+import pandas as pd
+import xlsxwriter
+import numpy
+
+flipflop = {'JK':2, 'D':1}
+choice = '0'
 def main():
 	arr = input("Enter Counter Sequence: ")
+	global choice
 	choice = input("Choose Flip Flop (JK or D): ")
 	
 	counter = list(map(int, arr.split(' ')))
 	cols = math.ceil(( math.log10(max(counter))/math.log10(2) + 1 ))
 	rows = len(counter)
-	table = gettable(rows, cols, choice)
+	table = gettable(rows, cols)
 	filltable(counter,table,cols)
 	if choice == "JK":
 		header = "Inputs(J0,K0,J1,K1...)"
@@ -18,11 +25,13 @@ def main():
 			row[2] = row[1]
 	print(tabulate(table, headers=["Current State", "Next State", header],tablefmt="fancy_grid",numalign="center",stralign="center"))
 	#printTable(table)
-	input("Press Enter")
+	excelchoice = input("Generate XLSX File?(y/n) ")
+	if(excelchoice == 'y' or excelchoice == 'Y'):
+		makeexcel(table)
 	
-def gettable(rows, columns, choice):
+def gettable(rows, columns):
 	foo = 0
-	flipflop = {'JK':2, 'D':1}
+	
 	table = [ [  [foo for i in range(columns)],
 			     [foo for j in range(columns)],
 			     [foo for k in range(columns * flipflop[choice])]  ] 
@@ -78,5 +87,25 @@ def makeJK(table, rows, cols):
 				table[m][2][k] = 0
 				j += 2
 				k += 2
-	
+def makeexcel(table):
+	workbook = xlsxwriter.Workbook('_table.xlsx')
+	worksheet = workbook.add_worksheet()
+	worksheet.set_column(1,50,5)
+	merge_format = workbook.add_format({
+		'bold': 1,
+		'border': 1,
+		'align': 'center',
+		})
+	cell_format = workbook.add_format()
+	cell_format.set_align('center')
+	cell_format.set_align('vcenter')
+	ln = len(table[0][0])
+	worksheet.merge_range(0 , 0, 0, ln-1, "Current State",merge_format)
+	worksheet.merge_range(0, ln, 0, ((ln-1)*2)+1, "Next State",merge_format)
+	worksheet.merge_range(0, ((ln-1)*2)+2 , 0, (((ln-1)*4)+3), "Inputs", merge_format)
+	for i in range(1,(len(table)+1)):
+		line = table[i-1][0] + table[i-1][1] + table[i-1][2]
+		for row,data in enumerate(line):
+			worksheet.write(i,row,data,cell_format)
+	workbook.close()
 main()
