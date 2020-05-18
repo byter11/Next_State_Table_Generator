@@ -16,6 +16,7 @@ def main():
 			row[2] = row[1]
 	print(tabulate(table, headers=["Current State", "Next State", "Inputs(J0,K0,J1,K1...)"],tablefmt="fancy_grid",numalign="center",stralign="center"))
 	#printTable(table)
+	input("Press Enter")
 	
 def gettable(rows, columns, choice):
 	foo = 0
